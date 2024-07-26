@@ -1,12 +1,19 @@
 const userRoutes = require("express").Router();
 const userController = require("../controllers/userController");
-const validate_user = require("../validators/validator");
+const {
+  validate_user_register,
+  validate_user_update,
+} = require("../validators/validator");
 const {
   verifyPasswordReset,
   verifyUserToken,
 } = require("../middlewares/authMiddleware");
 
-userRoutes.post("/user/register", validate_user, userController.registerUser);
+userRoutes.post(
+  "/user/register",
+  validate_user_register,
+  userController.registerUser
+);
 userRoutes.post("/user/register/verify", userController.verifyUser);
 userRoutes.post("/user/login", userController.loginUser);
 userRoutes.post("/user/forgot/password", userController.forgotPassword);
@@ -16,6 +23,14 @@ userRoutes.post(
   verifyPasswordReset,
   userController.resetPassword
 );
-//userRoutes.get("/user/profile");
+userRoutes.get("/user/profile", verifyUserToken, userController.getUserProfile);
+userRoutes.put(
+  "/user/profile/update",
+  validate_user_update,
+  verifyUserToken,
+  userController.updateUserProfile
+);
+//userRoutes.get("/user/transactions");
+//userRoutes.get("/user/wallet/balance");
 
 module.exports = userRoutes;

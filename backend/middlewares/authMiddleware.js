@@ -30,8 +30,23 @@ const decodeToken = async (token) => {
 
 const verifyUserToken = async (req, res, next) => {
   try {
+    const authHeader = req.headers.authorization;
+
+    // Check if the authorization header is provided
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ message: "Authorization token missing or malformed" });
+    }
+
+    // Extract the token from the authorization header
+    const token = authHeader.split(" ")[1];
+
+    // Verify the token
     const result = await jwt.verify(token, process.env.JWT_SECRET);
+    console.log(result);
     req.user = result;
+    next(); // Proceed to the next middleware/route handler
   } catch (err) {
     switch (err.name) {
       case "TokenExpiredError":

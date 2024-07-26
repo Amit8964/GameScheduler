@@ -20,7 +20,7 @@ app.use("/api/v1", userRoutes);
 
 // Middleware for handling invalid routes
 app.use((req, res, next) => {
-  next(new CustomError("Not Found", 404));
+  next(new CustomError("Route Not Found", 404));
 });
 
 // Use the global error handler middleware
