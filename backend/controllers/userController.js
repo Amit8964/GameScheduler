@@ -332,7 +332,9 @@ const updateUserProfile = async (req, res, next) => {
 
 const getUserWalletBalance = async (req, res) => {
   try {
-  } catch (err) {}
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
