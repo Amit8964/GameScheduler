@@ -45,7 +45,7 @@ const deleteGame = async (req, res, next) => {
         .status(200)
         .json({ success: true, message: "Game deleted successfully" });
     } else {
-      throw new CustomError("resources not found", 404);
+      throw new CustomError("Resources not found", 404);
     }
   } catch (err) {
     next(err);
