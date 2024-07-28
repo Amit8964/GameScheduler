@@ -59,11 +59,9 @@ const matchSchema = new mongoose.Schema({
   },
   rules: {
     type: String,
-    required: true,
   },
   description: {
     type: String,
-    required: true,
   },
   created_at: {
     type: Date,

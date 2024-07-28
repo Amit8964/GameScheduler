@@ -4,44 +4,45 @@ const { generateOtp, sendOtp } = require("../lib/otpLib");
 const { generateToken } = require("../middlewares/authMiddleware");
 const Wallet = require("../models/wallet");
 const CustomError = require("../lib/customError");
+const validateFields = require("../validators/validateFields");
 const {
   generateHashPassword,
   compareHashPassword,
 } = require("../utils/bcryptHash");
 
-const validateFields = async (payloadData, allowedFields, invalid, missing) => {
-  try {
-    const payloadFields = Object.keys(payloadData);
+// const validateFields = async (payloadData, allowedFields, invalid, missing) => {
+//   try {
+//     const payloadFields = Object.keys(payloadData);
 
-    if (invalid) {
-      const invalidFields = payloadFields.filter(
-        (field) => !allowedFields.includes(field)
-      );
+//     if (invalid) {
+//       const invalidFields = payloadFields.filter(
+//         (field) => !allowedFields.includes(field)
+//       );
 
-      if (invalidFields.length > 0) {
-        throw new CustomError(
-          `Invalid fields: ${invalidFields.join(", ")}`,
-          501
-        );
-      }
-    }
+//       if (invalidFields.length > 0) {
+//         throw new CustomError(
+//           `Invalid fields: ${invalidFields.join(", ")}`,
+//           501
+//         );
+//       }
+//     }
 
-    if (missing) {
-      const missingFields = allowedFields.filter(
-        (field) => !payloadFields.includes(field)
-      );
+//     if (missing) {
+//       const missingFields = allowedFields.filter(
+//         (field) => !payloadFields.includes(field)
+//       );
 
-      if (missingFields.length > 0) {
-        throw new CustomError(
-          `Missing required fields: ${missingFields.join(", ")}`,
-          400
-        );
-      }
-    }
-  } catch (err) {
-    throw err;
-  }
-};
+//       if (missingFields.length > 0) {
+//         throw new CustomError(
+//           `Missing required fields: ${missingFields.join(", ")}`,
+//           400
+//         );
+//       }
+//     }
+//   } catch (err) {
+//     throw err;
+//   }
+// };
 
 const registerUser = async (req, res, next) => {
   try {
