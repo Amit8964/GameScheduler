@@ -4,6 +4,9 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  phone: {
+    type: Number,
+  },
   email: {
     type: String,
     required: true,
@@ -17,6 +20,10 @@ const adminSchema = new mongoose.Schema({
     type: String,
     enum: ["superadmin", "admin"],
     default: "admin",
+  },
+  is_deleted: {
+    type: Boolean,
+    default: false,
   },
   created_at: {
     type: Date,

@@ -63,6 +63,10 @@ const matchSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  is_deleted: {
+    type: Boolean,
+    default: false,
+  },
   created_at: {
     type: Date,
     default: Date.now,

@@ -7,8 +7,10 @@ const {
 const {
   verifyPasswordReset,
   verifyUserToken,
+  verifyAdminToken,
 } = require("../middlewares/authMiddleware");
 
+//User Routes
 userRoutes.post(
   "/user/register",
   validate_user_register,
@@ -23,14 +25,41 @@ userRoutes.post(
   verifyPasswordReset,
   userController.resetPassword
 );
-userRoutes.get("/user/profile", verifyUserToken, userController.getUserProfile);
+userRoutes.get(
+  "/user/profile/:id",
+  verifyUserToken,
+  userController.getUserProfile
+);
 userRoutes.put(
-  "/user/profile/update",
+  "/user/profile/update/:id",
   validate_user_update,
   verifyUserToken,
   userController.updateUserProfile
 );
+
 //userRoutes.get("/user/transactions");
 //userRoutes.get("/user/wallet/balance");
+
+//Admin routes
+userRoutes.get(
+  "/admin/dashboard/user/block/:id",
+  verifyAdminToken,
+  userController.blockUser
+);
+userRoutes.get(
+  "/admin/dashboard/user/unblock/:id",
+  verifyAdminToken,
+  userController.unblockUser
+);
+userRoutes.get(
+  "/admin/dashboard/user/all/profile/",
+  verifyAdminToken,
+  userController.getAlluser
+);
+userRoutes.put(
+  "/admin/dashboard/user/profile/update/:id",
+  verifyAdminToken,
+  userController.adminUpdateUserProfile
+);
 
 module.exports = userRoutes;
