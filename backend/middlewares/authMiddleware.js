@@ -15,7 +15,7 @@ data:{
     */
   try {
     let token = await jwt.sign(data, process.env.JWT_SECRET, {
-      expiresIn: "4h",
+      expiresIn: "24h",
     });
     return token;
   } catch (err) {

@@ -90,7 +90,7 @@ const registerUser = async (req, res, next) => {
 const verifyUser = async (req, res, next) => {
   try {
     let payloadData = req.body;
-    let allowedFields = ["email", "phone", "otp"];
+    let allowedFields = ["email", "otp"];
     await validateFields(payloadData, allowedFields, true, true);
 
     let userData = await User.findOne({ email: payloadData.email });
@@ -210,10 +210,10 @@ const otpMatchForReset = async (req, res, next) => {
     const allowedFields = ["email", "otp"];
     await validateFields(payloadData, allowedFields, true, true);
     let userData = await services.findOne(User, { email: payloadData.email });
-    if (userData.is_blocked) {
-      throw new CustomError("Account is blocked", 403);
-    }
     if (userData) {
+      if (userData.is_blocked) {
+        throw new CustomError("Account is blocked", 403);
+      }
       if (userData.otp_expire_in >= Date.now()) {
         if (userData.otp == payloadData.otp) {
           //think about it

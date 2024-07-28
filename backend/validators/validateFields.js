@@ -1,3 +1,4 @@
+const CustomError = require("../lib/customError");
 const validateFields = async (payloadData, allowedFields, invalid, missing) => {
   try {
     const payloadFields = Object.keys(payloadData);

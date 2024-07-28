@@ -13,16 +13,19 @@ const {
 
 //User Routes
 userRoutes.post(
-  "/user/register",
+  "/user/register/profile",
   validate_user_register,
   userController.registerUser
 );
-userRoutes.post("/user/register/verify", userController.verifyUser);
-userRoutes.post("/user/login", userController.loginUser);
-userRoutes.post("/user/forgot/password", userController.forgotPassword);
-userRoutes.post("/user/reset/password/verify", userController.otpMatchForReset);
+userRoutes.post("/user/register/profile/verify", userController.verifyUser);
+userRoutes.post("/user/login/profile", userController.loginUser);
+userRoutes.post("/user/profile/forgot/password", userController.forgotPassword);
 userRoutes.post(
-  "/user/reset/password/:token",
+  "/user/profile/forgot/password/verify",
+  userController.otpMatchForReset
+);
+userRoutes.post(
+  "/user/profile/reset/password/:token",
   verifyPasswordReset,
   userController.resetPassword
 );
@@ -43,29 +46,39 @@ userRoutes.put(
 
 //Admin routes
 userRoutes.get(
-  "/admin/dashboard/user/block/:id",
+  "/admin/user-management/user/block/:id",
   verifyAdminToken,
   adminController.blockUser
 );
 userRoutes.get(
-  "/admin/dashboard/user/unblock/:id",
+  "/admin/user-management/user/unblock/:id",
 
   adminController.unblockUser
 );
 userRoutes.get(
-  "/admin/dashboard/user/profile",
+  "/admin/user-management/user/profile",
   verifyAdminToken,
   adminController.getAlluser
 );
 userRoutes.get(
-  "/admin/dashboard/user/profile/:id",
+  "/admin/user-management/user/profile/:id",
   verifyAdminToken,
   userController.getUserProfileSpecific
 );
 userRoutes.put(
-  "/admin/dashboard/user/profile/update/:id",
+  "/admin/user-management/user/profile/update/:id",
   verifyAdminToken,
   adminController.updateUserProfile
+);
+userRoutes.post(
+  "/admin/create/profile",
+  verifyAdminToken,
+  adminController.createAdmin
+);
+userRoutes.post(
+  "/admin/login/profile",
+
+  adminController.loginAdmin
 );
 
 module.exports = userRoutes;

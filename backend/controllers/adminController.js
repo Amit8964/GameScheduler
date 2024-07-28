@@ -1,4 +1,5 @@
 const Admin = require("../models/admin");
+const User = require("../models/user");
 const services = require("../services/services");
 const { generateOtp, sendOtp } = require("../lib/otpLib");
 const { generateToken } = require("../middlewares/authMiddleware");
@@ -17,6 +18,9 @@ const createAdmin = async (req, res, next) => {
     // }
 
     let payloadData = req.body;
+    if (req.user.role !== "superadmin") {
+      throw new CustomError("Unathorized access", 410);
+    }
     let userData = await Admin.findOne({ email: payloadData.email });
     if (userData) {
       res.status(409).json({
@@ -29,12 +33,11 @@ const createAdmin = async (req, res, next) => {
       const hashPassword = await generateHashPassword(payloadData.password);
       payloadData.password = hashPassword;
       //can not send is_verified field
-      let result = await services.saveData(User, payloadData);
+      let result = await services.saveData(Admin, payloadData);
       if (result) {
-        await sendOtp(result.email, result.otp);
         res
           .status(200)
-          .json({ success: true, message: "otp send successfully" });
+          .json({ success: true, message: "Admin created successfully" });
       }
     }
   } catch (err) {
@@ -75,7 +78,7 @@ const loginAdmin = async (req, res, next) => {
   }
 };
 
-const getAdminProfile = async (req, res) => {
+const getAdminProfile = async (req, res, next) => {
   try {
     const adminId = req.user.id;
     const adminEmail = req.user.email;
