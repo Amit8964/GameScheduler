@@ -1,5 +1,6 @@
 const userRoutes = require("express").Router();
 const userController = require("../controllers/userController");
+const adminController = require("../controllers/adminController");
 const {
   validate_user_register,
   validate_user_update,
@@ -28,7 +29,7 @@ userRoutes.post(
 userRoutes.get(
   "/user/profile/:id",
   verifyUserToken,
-  userController.getUserProfile
+  userController.getUserProfileSpecific
 );
 userRoutes.put(
   "/user/profile/update/:id",
@@ -44,22 +45,27 @@ userRoutes.put(
 userRoutes.get(
   "/admin/dashboard/user/block/:id",
   verifyAdminToken,
-  userController.blockUser
+  adminController.blockUser
 );
 userRoutes.get(
   "/admin/dashboard/user/unblock/:id",
-  verifyAdminToken,
-  userController.unblockUser
+
+  adminController.unblockUser
 );
 userRoutes.get(
-  "/admin/dashboard/user/all/profile/",
+  "/admin/dashboard/user/profile",
   verifyAdminToken,
-  userController.getAlluser
+  adminController.getAlluser
+);
+userRoutes.get(
+  "/admin/dashboard/user/profile/:id",
+  verifyAdminToken,
+  userController.getUserProfileSpecific
 );
 userRoutes.put(
   "/admin/dashboard/user/profile/update/:id",
   verifyAdminToken,
-  userController.adminUpdateUserProfile
+  adminController.updateUserProfile
 );
 
 module.exports = userRoutes;

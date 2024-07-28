@@ -96,8 +96,93 @@ const getAdminProfile = async (req, res) => {
   }
 };
 
+const blockUser = async (req, res, next) => {
+  try {
+    let userId = req.params.id;
+    let userData = await services.findByIdAndUpdate(
+      User,
+      userId,
+      { is_blocked: true },
+      {
+        new: true,
+        fields: { name: true, email: true, phone: true },
+      }
+    );
+    if (userData) {
+      res
+        .status(200)
+        .json({ success: true, message: "User Blocked successfully" });
+    } else {
+      throw new CustomError("Somthing went wrong", 404);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const unblockUser = async (req, res, next) => {
+  try {
+    let userId = req.params.id;
+    let userData = await services.findByIdAndUpdate(
+      User,
+      userId,
+      { is_blocked: false },
+      {
+        new: true,
+        fields: { name: true, email: true, phone: true },
+      }
+    );
+    if (userData) {
+      res
+        .status(200)
+        .json({ success: true, message: "User Unblocked successfully" });
+    } else {
+      throw new CustomError("Somthing went wrong", 404);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getAlluser = async (req, res, next) => {
+  try {
+    let result = await services.getData(User, {}, { password: false });
+    res.status(200).json({ success: true, payloadData: result });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateUserProfile = async (req, res, next) => {
+  try {
+    let payloadData = req.body;
+    let userId = req.params.id;
+    if (!userId) {
+      throw new CustomError("User id is required", 404);
+    }
+    if (payloadData.password) {
+      payloadData.password = await generateHashPassword(payloadData.password);
+    }
+    let userData = await services.findByIdAndUpdate(User, userId, payloadData, {
+      new: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Updated successfully",
+      payloadData: userData,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   createAdmin,
   loginAdmin,
   getAdminProfile,
+  blockUser,
+  unblockUser,
+  updateUserProfile,
+  getAlluser,
 };

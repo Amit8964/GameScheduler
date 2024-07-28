@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const CustomError = require("../lib/customError");
 const services = require("../services/services");
 const Admin = require("../models/admin");
+const User = require("../models/user");
 require("dotenv").config();
 
 const generateToken = async (data) => {

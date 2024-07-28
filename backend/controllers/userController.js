@@ -154,7 +154,7 @@ const loginUser = async (req, res, next) => {
           role: "user",
         });
         responseData = {
-          _id: userData.id,
+          id: userData._id,
           email: userData.email,
           wallet_id: userData.wallet_id,
           role: "user",
@@ -275,27 +275,59 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
-const getUserProfile = async (req, res, next) => {
+const getUserProfileSpecific = async (req, res, next) => {
   try {
     const userId = req.params.id;
+    // Validate user ID
     if (!userId) {
-      throw new CustomError("user id is required", 404);
+      return res
+        .status(404)
+        .json({ success: false, message: "User ID is required" });
     }
+    // Authorization check
+    const isAdmin = req.user.role === "admin" || req.user.role === "superadmin";
+    const isOwner = userId === req.user.id;
+
+    if (!isAdmin && !isOwner) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Unauthorized access" });
+    }
+
+    // Fetch user data
     const userData = await services.findOne(
       User,
       { _id: userId },
-      { _id: true, name: true, phone: true, email: true, wallet_id: true }
+      { password: false }
     );
 
-    if (userData.is_blocked) {
-      throw new CustomError("Account is blocked");
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    if (userData) {
-      res.status(200).json({ success: true, payloadData: userData });
-    } else {
-      throw new CustomError("User not found", 404);
+    // Check if the account is blocked (for non-admins)
+    if (!isAdmin && userData.is_blocked) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Account is blocked" });
     }
+
+    // Prepare response data
+    let responseData = {
+      _id: userData._id,
+      name: userData.name,
+      phone: userData.phone,
+      email: userData.email,
+      wallet_id: userData.wallet_id,
+    };
+
+    if (isAdmin) {
+      responseData = { ...userData.toObject(), password: undefined }; // Remove password for admin view
+    }
+    // Send response
+    res.status(200).json({ success: true, payloadData: responseData });
   } catch (err) {
     next(err);
   }
@@ -307,6 +339,9 @@ const updateUserProfile = async (req, res, next) => {
     const allowedFields = ["name", "email", "phone", "password", "oldPassword"];
     await validateFields(payloadData, allowedFields, true);
     let userId = req.params.id;
+    if (req.user.id !== userId) {
+      throw new CustomError("Unauthorized access", 410);
+    }
     if (payloadData.password) {
       await validateFields(
         payloadData,
@@ -365,87 +400,6 @@ const updateUserProfile = async (req, res, next) => {
   }
 };
 
-const blockUser = async (req, res, next) => {
-  try {
-    let userId = req.params.id;
-    let userData = await services.findByIdAndUpdate(
-      User,
-      userId,
-      { is_blocked: true },
-      {
-        new: true,
-        fields: { name: true, email: true, phone: true },
-      }
-    );
-    if (userData) {
-      res
-        .status(200)
-        .json({ success: true, message: "User Blocked successfully" });
-    } else {
-      throw new CustomError("Somthing went wrong", 404);
-    }
-  } catch (err) {
-    next(err);
-  }
-};
-
-const unblockUser = async (req, res, next) => {
-  try {
-    let userId = req.params.id;
-    let userData = await services.findByIdAndUpdate(
-      User,
-      userId,
-      { is_blocked: true },
-      {
-        new: true,
-        fields: { name: true, email: true, phone: true },
-      }
-    );
-    if (userData) {
-      res
-        .status(200)
-        .json({ success: true, message: "User Unblocked successfully" });
-    } else {
-      throw new CustomError("Somthing went wrong", 404);
-    }
-  } catch (err) {
-    next(err);
-  }
-};
-
-const getAlluser = async (req, res, next) => {
-  try {
-    let result = await services.getData(User, {}, { password: false });
-    res.status(200).json({ success: true, payloadData: result });
-  } catch (err) {
-    next(err);
-  }
-};
-
-const adminUpdateUserProfile = async (req, res, next) => {
-  try {
-    let payloadData = req.body;
-    let userId = req.params.id;
-    if (!userId) {
-      throw new CustomError("User id is required", 404);
-    }
-    if (payloadData.password) {
-      payloadData.password = await generateHashPassword(payloadData.password);
-    }
-    let userData = await services.findByIdAndUpdate(User, userId, payloadData, {
-      new: true,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Profile Updated successfully",
-      payloadData: userData,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
 const getUserWalletBalance = async (req, res) => {
   try {
   } catch (err) {
@@ -460,10 +414,6 @@ module.exports = {
   forgotPassword,
   otpMatchForReset,
   resetPassword,
-  getUserProfile,
+  getUserProfileSpecific,
   updateUserProfile,
-  blockUser,
-  unblockUser,
-  getAlluser,
-  adminUpdateUserProfile,
 };
