@@ -27,7 +27,7 @@ const updateGame = async (req, res, next) => {
 const deleteGame = async (req, res, next) => {
   try {
     if (req.user.role !== "superadmin") {
-      throw new CustomError("unauthorized access", 410);
+      throw new CustomError("Unauthorized access", 410);
     }
     let gameId = req.params.game_id;
     if (!gameId) {
