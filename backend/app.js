@@ -22,6 +22,9 @@ app.use("/api/v1", userRoutes);
 app.use((req, res, next) => {
   next(new CustomError("Route Not Found", 404));
 });
+app.get("/sujeet",(req,res)=>{
+res.send("<h1>sujeet mobile number: 7067408725</h1>");
+});
 
 // Use the global error handler middleware
 app.use(errorHandler);
